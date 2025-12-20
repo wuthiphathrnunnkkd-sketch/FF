@@ -1,0 +1,29 @@
+-- โค้ดปรับความเร็วแบบไม่มีระบบล็อค
+local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local fr = Instance.new("Frame", sg)
+fr.Size = UDim2.new(0, 200, 0, 110)
+fr.Position = UDim2.new(0.5, -100, 0.5, -55)
+fr.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+fr.Active = true
+fr.Draggable = true
+Instance.new("UICorner", fr)
+
+local box = Instance.new("TextBox", fr)
+box.Size = UDim2.new(0, 180, 0, 40)
+box.Position = UDim2.new(0, 10, 0, 10)
+box.PlaceholderText = "ความเร็ว..."  -- ภาษาไทยตรงนี้เอาไปด้วยได้ครับ
+box.Text = "16"
+box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+box.TextColor3 = Color3.new(1, 1, 1)
+
+local btn = Instance.new("TextButton", fr)
+btn.Size = UDim2.new(0, 180, 0, 40)
+btn.Position = UDim2.new(0, 10, 0, 60)
+btn.Text = "SET SPEED"
+btn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+btn.TextColor3 = Color3.new(1, 1, 1)
+
+btn.MouseButton1Click:Connect(function()
+    local h = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.WalkSpeed = tonumber(box.Text) or 16 end
+end)
