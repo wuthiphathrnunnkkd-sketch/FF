@@ -1,17 +1,17 @@
--- เมนูรวม: Speed + Jump + Fly + เสกดาบพื้นฐาน
+-- เมนูรวม: Speed + Jump + Fly + เสกดาบพื้นฐานที่ฟันได้ (Linked Sword)
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
 local fr = Instance.new("Frame", sg)
-fr.Size = UDim2.new(0, 220, 0, 280) -- ขยายหน้าต่างเพิ่มปุ่มเสกดาบ
-fr.Position = UDim2.new(0.5, -110, 0.5, -140)
+fr.Size = UDim2.new(0, 220, 0, 310) -- ขยายหน้าต่างเพิ่มปุ่มเสกดาบ
+fr.Position = UDim2.new(0.5, -110, 0.5, -155)
 fr.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 fr.Active = true
 fr.Draggable = true
 Instance.new("UICorner", fr)
 
--- (โค้ดส่วน Speed และ Jump เดิมของคุณ)
 local lp = game.Players.LocalPlayer
 local function getH() return lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") end
 
+-- ปุ่มปรับความเร็ว
 local btnSpeed = Instance.new("TextButton", fr)
 btnSpeed.Size = UDim2.new(0, 200, 0, 35)
 btnSpeed.Position = UDim2.new(0, 10, 0, 10)
@@ -20,6 +20,7 @@ btnSpeed.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 btnSpeed.TextColor3 = Color3.new(1, 1, 1)
 btnSpeed.MouseButton1Click:Connect(function() if getH() then getH().WalkSpeed = 100 end end)
 
+-- ปุ่มปรับแรงกระโดด
 local btnJump = Instance.new("TextButton", fr)
 btnJump.Size = UDim2.new(0, 200, 0, 35)
 btnJump.Position = UDim2.new(0, 10, 0, 50)
@@ -28,47 +29,63 @@ btnJump.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
 btnJump.TextColor3 = Color3.new(1, 1, 1)
 btnJump.MouseButton1Click:Connect(function() if getH() then getH().UseJumpPower = true getH().JumpPower = 100 end end)
 
--- [ ส่วนเสริม: ปุ่มเสกดาบ ]
+-- ปุ่มระบบบิน (Fly)
+local flying = false
+local btnFly = Instance.new("TextButton", fr)
+btnFly.Size = UDim2.new(0, 200, 0, 45)
+btnFly.Position = UDim2.new(0, 10, 0, 95)
+btnFly.Text = "เปิดระบบบิน (Fly Mode)"
+btnFly.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+btnFly.TextColor3 = Color3.new(1, 1, 1)
+btnFly.MouseButton1Click:Connect(function()
+    flying = not flying
+    btnFly.Text = flying and "ปิดระบบบิน" or "เปิดระบบบิน (Fly Mode)"
+    local char = lp.Character
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if flying then
+        local bv = Instance.new("BodyVelocity", root)
+        bv.Name = "FlyVel"
+        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.Velocity = Vector3.new(0, 0, 0)
+        task.spawn(function()
+            while flying do
+                bv.Velocity = getH().MoveDirection * 80 + Vector3.new(0, 1.5, 0)
+                task.wait()
+            end
+            bv:Destroy()
+        end)
+    end
+end)
+
+-- [ ส่วนเสริม: ปุ่มเสกดาบ Linked Sword ที่ฟันได้ ]
 local btnSword = Instance.new("TextButton", fr)
 btnSword.Size = UDim2.new(0, 200, 0, 50)
-btnSword.Position = UDim2.new(0, 10, 0, 100)
-btnSword.Text = "เสกดาบพื้นฐาน (Sword)"
+btnSword.Position = UDim2.new(0, 10, 0, 150)
+btnSword.Text = "เสกดาบฟันได้ (Linked Sword)"
 btnSword.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 btnSword.TextColor3 = Color3.new(1, 1, 1)
 
 btnSword.MouseButton1Click:Connect(function()
-    -- พยายามดึงดาบจาก LinkedSword (ดาบคลาสสิกของ Roblox)
-    local sword = game:GetObjects("rbxassetid://125013769")[1] 
-    if sword then
-        sword.Parent = lp.Backpack
+    -- พยายามดึงดาบ Linked Sword (Asset ID ดั้งเดิมของ Roblox)
+    local swordAssetId = 125013769
+    local success, item = pcall(function() return game:GetObjects("rbxassetid://" .. swordAssetId)[1] end)
+    
+    if success and item then
+        if lp.Backpack:FindFirstChild(item.Name) then -- ถ้ามีดาบอยู่แล้ว
+            lp.Backpack:FindFirstChild(item.Name):Destroy() -- ลบของเก่าก่อน
+        end
+        item.Parent = lp.Backpack -- เอาดาบใส่กระเป๋า
+        print("เสกดาบ Linked Sword สำเร็จ!")
     else
-        print("ไม่สามารถเสกดาบได้ในแมพนี้เนื่องจากระบบป้องกัน")
+        warn("ไม่สามารถเสกดาบ Linked Sword ได้, อาจถูกบล็อกโดยแมพ หรือ Asset ID เปลี่ยนแปลงไปแล้ว")
     end
 end)
 
--- ปุ่มปิดเมนู (เพื่อความสะดวก)
+-- ปุ่มปิดเมนู
 local btnClose = Instance.new("TextButton", fr)
 btnClose.Size = UDim2.new(0, 200, 0, 30)
-btnClose.Position = UDim2.new(0, 10, 0, 240)
+btnClose.Position = UDim2.new(0, 10, 0, 270)
 btnClose.Text = "ปิดเมนู"
 btnClose.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 btnClose.TextColor3 = Color3.new(1, 1, 1)
 btnClose.MouseButton1Click:Connect(function() sg:Destroy() end)
--- ปุ่มกดปรับแรงกระโดด
-local btnJump = Instance.new("TextButton", fr)
-btnJump.Size = UDim2.new(0, 200, 0, 35)
-btnJump.Position = UDim2.new(0, 10, 0, 130)
-btnJump.Text = "ปรับระยะกระโดด"
-btnJump.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
-btnJump.TextColor3 = Color3.new(1, 1, 1)
-
--- ระบบทำงาน
-btnSpeed.MouseButton1Click:Connect(function()
-    local h = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.WalkSpeed = tonumber(boxSpeed.Text) or 16 end
-end)
-
-btnJump.MouseButton1Click:Connect(function()
-    local h = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if h then h.JumpPower = tonumber(boxJump.Text) or 50 end
-end)
