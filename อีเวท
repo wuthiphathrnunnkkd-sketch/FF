@@ -1,0 +1,4 @@
+-- รันสคริปต์สำหรับ Evade โดยเฉพาะ (สไตล์ TikTok ที่มีระบบ Warhawk/Fly/Autofarm)
+-- สคริปต์นี้จะรวมฟังก์ชันสไลด์ท่าทางและระบบช่วยเล่นในแมพ Evade ไว้ครบครับ
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/9v8v/Warhawk/main/Evade"))()
