@@ -1,4 +1,50 @@
--- รันสคริปต์สำหรับ Evade โดยเฉพาะ (สไตล์ TikTok ที่มีระบบ Warhawk/Fly/Autofarm)
--- สคริปต์นี้จะรวมฟังก์ชันสไลด์ท่าทางและระบบช่วยเล่นในแมพ Evade ไว้ครบครับ
+-- [[ EVENT & EVADE ULTIMATE SCRIPT ]]
+local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local fr = Instance.new("Frame", sg)
+fr.Size = UDim2.new(0, 250, 0, 200)
+fr.Position = UDim2.new(0.5, -125, 0.5, -100)
+fr.BackgroundColor3 = Color3.fromRGB(30, 0, 0) -- สีแดงเข้มแบบอีเวนท์
+fr.Active = true
+fr.Draggable = true
+Instance.new("UICorner", fr)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/9v8v/Warhawk/main/Evade"))()
+-- [ 1. ปุ่มรันสคริปต์ Warhawk (สำหรับทำบั๊กสไลด์/พุ่ง) ]
+local btnWar = Instance.new("TextButton", fr)
+btnWar.Size = UDim2.new(0, 230, 0, 60)
+btnWar.Position = UDim2.new(0, 10, 0, 20)
+btnWar.Text = "🔥 RUN WARHAWK (อีเวท) 🔥"
+btnWar.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+btnWar.TextColor3 = Color3.new(1, 1, 0)
+btnWar.Font = Enum.Font.SourceSansBold
+btnWar.TextSize = 20
+
+btnWar.MouseButton1Click:Connect(function()
+    -- ดึงสคริปต์ Warhawk ต้นฉบับมาทำงานทันที
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/9v8v/Warhawk/main/Evade"))()
+    btnWar.Text = "รันสำเร็จแล้ว!"
+    btnWar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+end)
+
+-- [ 2. ปุ่มเปิดไฟสว่าง (Full Bright) สำหรับแมพมืดๆ ]
+local btnLight = Instance.new("TextButton", fr)
+btnLight.Size = UDim2.new(0, 230, 0, 45)
+btnLight.Position = UDim2.new(0, 10, 0, 90)
+btnLight.Text = "เปิดไฟสว่าง (Full Bright)"
+btnLight.BackgroundColor3 = Color3.fromRGB(0, 150, 200)
+btnLight.TextColor3 = Color3.new(1, 1, 1)
+
+btnLight.MouseButton1Click:Connect(function()
+    game:GetService("Lighting").Brightness = 2
+    game:GetService("Lighting").ClockTime = 14
+    game:GetService("Lighting").FogEnd = 100000
+    game:GetService("Lighting").GlobalShadows = false
+end)
+
+-- [ 3. ปุ่มปิดเมนูนี้ ]
+local btnClose = Instance.new("TextButton", fr)
+btnClose.Size = UDim2.new(0, 230, 0, 35)
+btnClose.Position = UDim2.new(0, 10, 0, 145)
+btnClose.Text = "ปิดหน้าต่างนี้"
+btnClose.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+btnClose.TextColor3 = Color3.new(1, 1, 1)
+btnClose.MouseButton1Click:Connect(function() sg:Destroy() end)
