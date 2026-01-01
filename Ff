@@ -1,0 +1,47 @@
+-- [[ MY CUSTOM GANTZ TRACKING ]]
+-- ระบบล็อคเป้ากระสุนติดตาม (Silent Aim)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+-- ตั้งค่ารัศมีการล็อค (FOV) เหมือนในรูปที่คุณส่งมา
+local FOV_RADIUS = 288 
+
+-- ฟังก์ชันหาเป้าหมายที่อยู่ในระยะวงกลม
+function GetClosestToMouse()
+    local Target = nil
+    local MaxDist = FOV_RADIUS
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            local Pos, OnScreen = game.Workspace.CurrentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+            if OnScreen then
+                local Dist = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(Pos.X, Pos.Y)).Magnitude
+                if Dist < MaxDist then
+                    MaxDist = Dist
+                    Target = v
+                end
+            end
+        end
+    end
+    return Target
+end
+
+-- ระบบดักจับการยิงให้พุ่งเข้าหาเป้าหมาย (Silent Aim)
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldNamecall = mt.__namecall
+
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+    if method == "FindPartOnRayWithIgnoreList" and not checkcaller() then
+        local T = GetClosestToMouse()
+        if T then
+            -- เปลี่ยนทิศทางกระสุนให้ไปที่กลางตัวเป้าหมายอัตโนมัติ
+            args[1] = Ray.new(game.Workspace.CurrentCamera.CFrame.Position, (T.Character.HumanoidRootPart.Position - game.Workspace.CurrentCamera.CFrame.Position).unit * 1000)
+            return oldNamecall(self, unpack(args))
+        end
+    end
+    return oldNamecall(self, ...)
+end)
